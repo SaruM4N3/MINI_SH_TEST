@@ -46,6 +46,7 @@ int	main(int ac, char **av, char **env)
 			return (1);
 		}
 		free_cmds(data.cmds);
+		free_envp(data.envp);
 		free(line);
 	}
 	// on arrive jamais ici

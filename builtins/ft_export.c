@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lebroue <leobroue@student.42lyon.fr>       +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 19:57:14 by lebroue           #+#    #+#             */
-/*   Updated: 2025/11/05 04:10:02 by lebroue          ###   ########.fr       */
+/*   Updated: 2025/11/06 03:34:58 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,22 +79,23 @@ static int	process_single_arg(char *arg, t_data *data)
 	return (exit_flag);
 }
 
-int	ft_export(char **args, char **env, t_data *data)
+int ft_export(char **args, char **env, t_data *data)
 {
-	int	i;
-	int	exit_code;
+    int i;
+    int exit_code;
 
-	i = 0;
-	exit_code = 0;
-	if (!args[1])
-		return (handle_no_args(env));
-	i = 1;
-	while (args[i] != NULL)
-	{
-		if (process_single_arg(args[i], data))
-			exit_code = 1;
-		i++;
-	}
-	update_envp(data);
-	return (exit_code);
+    i = 0;
+    exit_code = 0;
+    if (!args[1])
+        return (handle_no_args(env));
+    i = 1;
+    while (args[i] != NULL)
+    {
+        if (process_single_arg(args[i], data))
+            exit_code = 1;
+        i++;
+    }
+    update_envp(data);
+    return (exit_code);
 }
+

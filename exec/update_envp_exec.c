@@ -6,7 +6,7 @@
 /*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:41:44 by lebroue           #+#    #+#             */
-/*   Updated: 2025/11/06 02:51:22 by zsonie           ###   ########lyon.fr   */
+/*   Updated: 2025/11/06 03:29:13 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ char	**build_envp_tab_from_lst_env(t_env *env)
 		{
 			free(envp[i]);
 			envp[i] = ft_strjoin(key_equal, curr->value);
-			free(key_equal);
 		}
+		free(key_equal);
 		if (!ft_strjoin_checker_envp(envp[i], envp, i))
 			return (NULL);
 		curr = curr->next;

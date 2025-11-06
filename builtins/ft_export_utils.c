@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lebroue <leobroue@student.42lyon.fr>       +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 02:09:37 by lebroue           #+#    #+#             */
-/*   Updated: 2025/11/05 02:23:28 by lebroue          ###   ########.fr       */
+/*   Updated: 2025/11/06 04:17:02 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,29 +29,26 @@ static void	split_key_value(const char *str, char **key_out, char **value_out)
 	}
 }
 
-static bool	try_update_existing_env(t_env *env, const char *key, char *value)
+static bool try_update_existing_env(t_env *env, const char *key, char *value)
 {
-	t_env	*tmp;
+    t_env   *tmp;
 
-	tmp = env;
-	while (tmp)
-	{
-		if (!ft_strcmp(tmp->key, key))
-		{
-			if (value)
-			{
-				free(tmp->value);
-				tmp->value = value;
-			}
-			else
-			{
-				free((char *)key);
-			}
-			return (true);
-		}
-		tmp = tmp->next;
-	}
-	return (false);
+    tmp = env;
+    while (tmp)
+    {
+        if (!ft_strcmp(tmp->key, key))
+        {
+            if (value)
+            {
+                free(tmp->value);
+                tmp->value = value;
+            }
+            free((char *)key);
+            return (true);
+        }
+        tmp = tmp->next;
+    }
+    return (false);
 }
 
 static void	add_new_env_node(t_env **env, char *key, char *value)
