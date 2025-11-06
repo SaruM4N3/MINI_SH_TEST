@@ -3,33 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hadia <hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 04:59:50 by hadia             #+#    #+#             */
-/*   Updated: 2025/11/04 22:33:27 by hadia            ###   ########.fr       */
+/*   Updated: 2025/11/06 02:19:06 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
-
-static void	process_expansion(const char *str, size_t *i, size_t *j,
-		t_expand_data *data)
-{
-	if (str[*i] == '\\' && str[*i + 1] == '$')
-	{
-		(*data->result)[(*j)++] = '$';
-		(*i) += 2;
-	}
-	else if (str[*i] == '$')
-	{
-		if (!handle_dollar_sign(str, i, data))
-		{
-			free(*data->result);
-			*data->result = NULL;
-			return ;
-		}
-	}
-}
 
 static void	handle_mixed_quotes(const char *str, size_t *i)
 {
@@ -52,21 +33,43 @@ static void	handle_expansion(const char *str, size_t *i, size_t *j,
 	char	*new_result;
 
 	handle_mixed_quotes(str, i);
-	process_expansion(str, i, j, data);
-	if (*j >= *(data->result_size) - 1)
+	
+	// Special case
+	if (str[*i] == '\\' && str[*i + 1] == '$')
 	{
-		*(data->result_size) *= 2;
-		new_result = ft_realloc(*data->result, *(data->result_size));
-		if (!new_result)
+		(*data->result)[(*j)++] = '$';
+		(*i) += 2;
+		return;
+	}
+	else if (str[*i] == '$')
+	{
+		if (!handle_dollar_sign(str, i, data))
 		{
 			free(*data->result);
 			*data->result = NULL;
-			return ;
 		}
-		*data->result = new_result;
+		return;
 	}
-	(*data->result)[(*j)++] = str[(*i)++];
+	
+	// Regular case
+	if (str[*i])
+	{
+		if (*j >= *(data->result_size) - 1)
+		{
+			*(data->result_size) *= 2;
+			new_result = ft_realloc(*data->result, *(data->result_size));
+			if (!new_result)
+			{
+				free(*data->result);
+				*data->result = NULL;
+				return ;
+			}
+			*data->result = new_result;
+		}
+		(*data->result)[(*j)++] = str[(*i)++];
+	}
 }
+
 
 static char	*expand_simple_string(const char *str)
 {

@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hadia <hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 05:00:07 by hadia             #+#    #+#             */
-/*   Updated: 2025/11/01 05:26:36 by hadia            ###   ########.fr       */
+/*   Updated: 2025/11/05 21:17:21 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
+#include "ft_free.h"
 
 int	tokenize_operator(const char *line, int *i, int *start, t_token **tokens)
 {

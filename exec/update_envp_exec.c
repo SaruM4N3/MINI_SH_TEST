@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   update_envp_exec.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lebroue <leobroue@student.42lyon.fr>       +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:41:44 by lebroue           #+#    #+#             */
-/*   Updated: 2025/11/05 19:33:44 by lebroue          ###   ########.fr       */
+/*   Updated: 2025/11/06 02:51:22 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,36 +50,29 @@ char	**build_envp_tab_from_lst_env(t_env *env)
 
 	i = 0;
 	curr = env;
-	envp = malloc(sizeof(char *) * (count_node(curr) + 1));
+	envp = ft_calloc(sizeof(char *), (count_node(curr) + 1));
 	if (!envp)
 		return (NULL);
 	while (curr)
 	{
-		// si key existe et que value vault NULL
 		if (curr->key && curr->value == NULL)
-			envp[i] = ft_strdup(curr->key); // dsddsddsdsds
+			envp[i] = ft_strdup(curr->key);
 		else if (curr->value != NULL)
 		{
 			free(envp[i]);
 			envp[i] = ft_strjoin(curr->key, "=");
 		}
-		// printf("res 1: '%s'\n", envp[i]);
 		if (!ft_strjoin_checker_envp(envp[i], envp, i))
 			return (NULL);
-		// printf("res 2: '%s'\n", envp[i]);
-		key_equal = envp[i];
-		// printf("%s\n", envp[i]);
+		key_equal = ft_strdup(envp[i]);
 		if (curr->value != NULL)
-		
 		{
 			free(envp[i]);
-			envp[i] = ft_strjoin(key_equal, curr->value); //
+			envp[i] = ft_strjoin(key_equal, curr->value);
+			free(key_equal);
 		}
-		printf("res 3: '%s'\n", envp[i]);
 		if (!ft_strjoin_checker_envp(envp[i], envp, i))
 			return (NULL);
-		// printf("OKKKKKKKKKKKKKKKKKKKKKKKK 3 \n");
-		printf("Res final '%s'\n", envp[i]);
 		curr = curr->next;
 		i++;
 	}
@@ -125,5 +118,4 @@ void	update_envp(t_data *data)
 	if (data->envp)
 		free_envp(data->envp);
 	data->envp = build_envp_tab_from_lst_env(data->env);
-	// printf("data envp: %p\n", data->envp);
 }

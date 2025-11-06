@@ -17,6 +17,11 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h> // c
+# include "ft_free.h"
+
+#ifndef DEBUG_MODE
+# define DEBUG_MODE 0
+#endif
 
 ////////////ENV.C && LST_UTILS_ENV.C///////////
 

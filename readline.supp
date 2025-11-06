@@ -1,12 +1,12 @@
 {
-    leak readline
-    Memcheck:Leak 
-    ...
-    fun:readline
+   Readline_All_Functions
+   Memcheck:Leak
+   ...
+   obj:*/libreadline.so*
 }
 {
-    leak add_history
-    Memcheck:Leak
-    ...
-    fun:add_history
+   Readline_All_Functions
+   Memcheck:Leak
+   ...
+   obj:/usr/bin/*
 }

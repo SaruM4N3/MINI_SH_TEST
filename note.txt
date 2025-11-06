@@ -1,0 +1,305 @@
+
+rajout QoL:
+
+	-Makefile: 		# Compile for valgrind
+					debug: CFLAGS += -g3
+					debug: fclean all
+						valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp --trace-children=yes ./minishell
+
+					# Compile for debug mode + valgrind
+					fdebug: CFLAGS += -g3 -DDEBUG_MODE=1
+					fdebug: fclean all
+						DEBUG_MODE=1 valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp --trace-children=yes ./minishell
+
+	-minishell.h:	#ifndef DEBUG_MODE
+					# define DEBUG_MODE 0
+					#endif
+
+	-*.c: quand tu veux faire des printf de debug etc tu mets juste une condition pour check DEBUG_MODE
+			exemple:
+					if (DEBUG_MODE)
+					{
+						print_cmds(data.cmds);
+						// print_lst_env(envd);
+					}
+
+Problemes mineurs:
+	
+	-Exit code 1 au lieu de 0 quand on exit direct
+
+
+Problemes MAJEURS:
+
+	-conditional jump: 
+
+		Test:	on relance minishell dans minishell
+
+		Source:	(fichier:ligne):(update_envp_exec.c:53) et (update_envp_exec.c:70)
+				fonction: build_envp_tab_from_lst_env(t_env *env)
+				ligne:	53: envp = malloc(sizeof(char *) * (count_node(curr) + 1));
+						70: key_equal = envp[i];
+
+		Fix:	(fichier:ligne):(update_envp_exec.c:53) et (update_envp_exec.c:70)
+				fonction: build_envp_tab_from_lst_env(t_env *env)
+				ligne:	53: envp = ft_calloc(sizeof(char *), (count_node(curr) + 1));
+						70: key_equal = ft_strdup(envp[i]);
+							free(key_equal);
+
+
+regles (parceque c'est la merde):
+	-ft_calloc a privilegier par rapport a malloc quand tu veux faire des free de batards, ca evite les invalid free!
+		(sinon faut refaire une bonne partie du code et rendre plus propre pleins de bails)
+
+		exemple :	dans la fonction build_envp_tab_from_lst_env(t_env *env)
+
+					53: envp = ft_calloc(sizeof(char *), (count_node(curr) + 1));
+					70: key_equal = ft_strdup(envp[i]);
+		car ici :
+					key_equal = envp[i]; // key_equal pointe sur envp[i] mais vu que tu free 3 ligne en dessous et que tu l'utilise dans le strjoin juste apres, tu as un conditional jump
+					// printf("%s\n", envp[i]);
+					if (curr->value != NULL)
+					{
+						free(envp[i]); // ici tu free envp[i] mais key_equal est pas une duplication
+						envp[i] = ft_strjoin(key_equal, curr->value); // donc ici erreur
+					}
+			DONC:
+					BEFORE:
+						char	**build_envp_tab_from_lst_env(t_env *env)
+						{
+							t_env	*curr;
+							int		i;
+							char	**envp;
+							char	*key_equal;
+
+							i = 0;
+							curr = env;
+							envp = malloc(sizeof(char *) * (count_node(curr) + 1));
+							if (!envp)
+								return (NULL);
+							while (curr)
+							{
+								// si key existe et que value vault NULL
+								if (curr->key && curr->value == NULL)
+									envp[i] = ft_strdup(curr->key); // dsddsddsdsds
+								else if (curr->value != NULL)
+								{
+									free(envp[i]);
+									envp[i] = ft_strjoin(curr->key, "=");
+								}
+								// printf("res 1: '%s'\n", envp[i]);
+								if (!ft_strjoin_checker_envp(envp[i], envp, i))
+									return (NULL);
+								// printf("res 2: '%s'\n", envp[i]);
+								key_equal = envp[i];
+								// printf("%s\n", envp[i]);
+								if (curr->value != NULL)
+
+								{
+									free(envp[i]);
+									envp[i] = ft_strjoin(key_equal, curr->value); //
+								}
+								printf("res 3: '%s'\n", envp[i]);
+								if (!ft_strjoin_checker_envp(envp[i], envp, i))
+									return (NULL);
+								// printf("OKKKKKKKKKKKKKKKKKKKKKKKK 3 \n");
+								printf("Res final '%s'\n", envp[i]);
+								curr = curr->next;
+								i++;
+							}
+							envp[i] = NULL;
+							return (envp);
+						}
+					AFTER:
+						char	**build_envp_tab_from_lst_env(t_env *env)
+						{
+							t_env	*curr;
+							int		i;
+							char	**envp;
+							char	*key_equal;
+
+							i = 0;
+							curr = env;
+							envp = ft_calloc(sizeof(char *), (count_node(curr) + 1));
+							if (!envp)
+								return (NULL);
+							while (curr)
+							{
+								if (curr->key && curr->value == NULL)
+									envp[i] = ft_strdup(curr->key);
+								else if (curr->value != NULL)
+								{
+									free(envp[i]);
+									envp[i] = ft_strjoin(curr->key, "=");
+								}
+								if (!ft_strjoin_checker_envp(envp[i], envp, i))
+									return (NULL);
+								key_equal = ft_strdup(envp[i]);
+								if (curr->value != NULL)
+								{
+									free(envp[i]);
+									envp[i] = ft_strjoin(key_equal, curr->value);
+									free(key_equal);
+								}
+								if (!ft_strjoin_checker_envp(envp[i], envp, i))
+									return (NULL);
+								curr = curr->next;
+								i++;
+							}
+							envp[i] = NULL;
+							return (envp);
+						}
+
+Problème MAJEUR:
+			Test: echo $? → Invalid read of size 1 après la fin du buffer alloué
+
+			Source: (fichier:ligne):(expander.c:90)
+			fonction: handle_expansion(const char *str, size_t *i, size_t *j, t_expand_data *data)
+			ligne: 90: (*data->result)[(*j)++] = str[(*i)++];
+
+			Explication:	Avec str = "$?" (3 bytes: '$', '?', '\0'):
+							1. handle_expansion appelle process_expansion
+							2. process_expansion détecte '$' et appelle handle_dollar_sign
+							3. handle_dollar_sign incrémente *i de 0 → 1 (skip '$')
+							4. handle_variable_expansion détecte '?' et incrémente *i de 1 → 2
+							5. Retour dans handle_expansion
+							6. Ligne 90 lit str[2] (le '\0') et incrémente *i → 3
+							7. Prochaine itération: str[3] → LECTURE HORS DU BUFFER ALLOUÉ
+
+					DONC:
+
+						BEFORE:
+
+						process_expansion() traitait $? et incrémentait *i
+
+						handle_expansion() copiait quand même str[*i] après
+
+						Résultat: double consommation → lecture hors buffer
+
+						CORRECTED:
+
+						Si c'est un cas spécial ($, \$) → traite ET return (pas de copie)
+
+						Si c'est un caractère normal → copie seulement
+
+						Jamais les deux en même temps
+
+			BEFORE:
+
+					static void	process_expansion(const char *str, size_t *i, size_t *j,
+							t_expand_data *data)
+					{
+						if (str[*i] == '\\' && str[*i + 1] == '$')
+						{
+							(*data->result)[(*j)++] = '$';
+							(*i) += 2;
+						}
+						else if (str[*i] == '$')
+						{
+							if (!handle_dollar_sign(str, i, data))
+							{
+								free(*data->result);
+								*data->result = NULL;
+								return ;
+							}
+						}
+					}
+
+					static void	handle_mixed_quotes(const char *str, size_t *i)
+					{
+						if ((str[*i] == '"' && str[*i + 1] == '"') || (str[*i] == '\'' && str[*i
+								+ 1] == '\''))
+						{
+							(*i) += 2;
+							return ;
+						}
+						if (str[*i] == '"' || str[*i] == '\'')
+						{
+							(*i)++;
+							return ;
+						}
+					}
+
+					static void	handle_expansion(const char *str, size_t *i, size_t *j,
+							t_expand_data *data)
+					{
+						char	*new_result;
+
+						handle_mixed_quotes(str, i);
+						process_expansion(str, i, j, data);
+						if (*j >= *(data->result_size) - 1)
+						{
+							*(data->result_size) *= 2;
+							new_result = ft_realloc(*data->result, *(data->result_size));
+							if (!new_result)
+							{
+								free(*data->result);
+								*data->result = NULL;
+								return ;
+							}
+							*data->result = new_result;
+						}
+						(*data->result)[(*j)++] = str[(*i)++];
+					}
+
+			AFTER:
+
+					static void	handle_mixed_quotes(const char *str, size_t *i)
+					{
+						if ((str[*i] == '"' && str[*i + 1] == '"') || (str[*i] == '\'' && str[*i
+								+ 1] == '\''))
+						{
+							(*i) += 2;
+							return ;
+						}
+						if (str[*i] == '"' || str[*i] == '\'')
+						{
+							(*i)++;
+							return ;
+						}
+					}
+
+					static void	handle_expansion(const char *str, size_t *i, size_t *j,
+							t_expand_data *data)
+					{
+						char	*new_result;
+
+						handle_mixed_quotes(str, i);
+
+						// Special case
+						if (str[*i] == '\\' && str[*i + 1] == '$')
+						{
+							(*data->result)[(*j)++] = '$';
+							(*i) += 2;
+							return;
+						}
+						else if (str[*i] == '$')
+						{
+							if (!handle_dollar_sign(str, i, data))
+							{
+								free(*data->result);
+								*data->result = NULL;
+							}
+							return;
+						}
+
+						// Regular case
+						if (str[*i])
+						{
+							if (*j >= *(data->result_size) - 1)
+							{
+								*(data->result_size) *= 2;
+								new_result = ft_realloc(*data->result, *(data->result_size));
+								if (!new_result)
+								{
+									free(*data->result);
+									*data->result = NULL;
+									return ;
+								}
+								*data->result = new_result;
+							}
+							(*data->result)[(*j)++] = str[(*i)++];
+						}
+					}
+
+
+

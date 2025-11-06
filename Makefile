@@ -55,6 +55,16 @@ $(OBJ_DIR)/%.o: %.c $(HEADER) Makefile | $(OBJ_DIR)
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -O3 -c $< -o $@
 
+# Compile for valgrind
+debug: CFLAGS += -g3
+debug: fclean all
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp --trace-children=yes ./minishell
+
+# Compile for debug mode + valgrind
+fdebug: CFLAGS += -g3 -DDEBUG_MODE=1
+fdebug: fclean all
+	DEBUG_MODE=1 valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp --trace-children=yes ./minishell
+
 clean:
 	rm -rf $(OBJ_DIR)
 	$(MAKE) -C $(LIB_DIR) clean

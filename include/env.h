@@ -13,7 +13,6 @@ typedef struct s_env
 	char *key;          // HOME
 	char *value;        // /home/lebroue
 	struct s_env *next; // On passe a la variable d'env d'apres
-
 }						t_env;
 
 // Structure principale de données

@@ -82,6 +82,8 @@ typedef struct s_expand_data
 	size_t			*j;
 }					t_expand_data;
 
+# include "ft_free.h"
+
 // Variable globale pour l'exit status
 extern int			g_exit_status;
 
@@ -159,12 +161,7 @@ char				**init_args_array(const char *cmd_name, int *capacity);
 
 /* ========== UTILITAIRES ========== */
 
-// Libération mémoire
-void				free_tokens(t_token *head);
-void				free_cmds(t_cmd *cmds);
-void				free_redirs(t_redir *redirs);
-void				free_args(char **args);
-void				free_args_on_error(char **args);
+
 // Debug (optionnel)
 void				print_tokens(t_token *tokens);
 void				print_cmds(t_cmd *cmds);

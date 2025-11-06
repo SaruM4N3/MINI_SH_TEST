@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_all.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lebroue <leobroue@student.42lyon.fr>       +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/27 21:52:57 by lebroue           #+#    #+#             */
-/*   Updated: 2025/11/05 03:05:51 by lebroue          ###   ########.fr       */
+/*   Updated: 2025/11/06 02:48:51 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	free_all(t_data *data, int errcode, char *str)
 	if (data->cmds)
 		free_cmds(data->cmds);
 	if (data->envp)
-		free_tab(data->envp);
+		free_envp(data->envp);
 	if (data->dst)
 		free_tab(data->dst);
 	if (str)

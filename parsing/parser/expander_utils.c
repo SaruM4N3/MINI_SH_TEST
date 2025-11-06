@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hadia <hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 05:00:25 by hadia             #+#    #+#             */
-/*   Updated: 2025/11/04 22:25:23 by hadia            ###   ########.fr       */
+/*   Updated: 2025/11/06 02:09:51 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,12 +90,15 @@ static int	handle_variable_expansion(const char *line, size_t *i,
 		t_expand_data *data)
 {
 	char	*var_name;
-
+	
 	if (line[*i] == '?')
 	{
 		(*i)++;
 		if (!expand_exit_status(data->result, data->j, data->result_size))
+		{
+			__builtin_printf("yo i=%zu\n", *i);
 			return (0);
+		}
 	}
 	else if (ft_isalpha(line[*i]) || line[*i] == '_')
 	{

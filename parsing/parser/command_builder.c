@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   command_builder.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hadia <hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 05:00:20 by hadia             #+#    #+#             */
-/*   Updated: 2025/11/04 22:24:29 by hadia            ###   ########.fr       */
+/*   Updated: 2025/11/05 21:17:00 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
+#include "ft_free.h"
 
 static int	process_redirection_token(t_token **current,
 		t_redir_type redir_type, t_cmd *cmd)
