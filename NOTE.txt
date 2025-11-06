@@ -1,0 +1,6 @@
+SALUT,
+jai fix pleins de trucs et jai fait un README.md 
+mais jai demander a chatgpt de fix .md donc ya des trucs qu'il a pas tres bien
+reconstruit mais le principal est dedans, lis le mais surtout regarde les fichiers que
+jai modifier, ya pas mal de trucs de fix.
+Force a toi mon reuf.
